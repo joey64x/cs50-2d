@@ -12,9 +12,11 @@ PipePair = Class{}
 
 -- size of the gap between pipes
 local GAP_HEIGHT = 90
-local GAP_VARIANCE = 20 -- random range larger or smaller, that we offset the gap between pipes
+local GAP_VARIANCE = 10 -- random range larger or smaller, that we offset the gap between pipes
+local FLOW_AMPLITUDE = 20   -- how many pixels the flow can widen/narrow the gap
+local FLOW_FREQUENCY = 0.6  -- how fast the wave cycles per point scored
 
-function PipePair:init(y)
+function PipePair:init(y, score)
     -- flag to hold whether this pair has been scored (jumped through)
     self.scored = false
 
@@ -23,6 +25,9 @@ function PipePair:init(y)
 
     -- y value is for the topmost pipe; gap is a vertical shift of the second lower pipe
     self.y = y
+
+    -- get a smoothly oscillating offset to adjust the pipes so we can get a flow-like difficulty
+    local flowOffset = math.sin(score * FLOW_FREQUENCY) * FLOW_AMPLITUDE
 
     -- randomize the amount we will vary the gap
     local gapChange = math.random(0, GAP_VARIANCE)
@@ -34,7 +39,7 @@ function PipePair:init(y)
     -- instantiate two pipes that belong to this pair
     self.pipes = {
         ['upper'] = Pipe('top', self.y),
-        ['lower'] = Pipe('bottom', self.y + PIPE_HEIGHT + GAP_HEIGHT + gapChange)
+        ['lower'] = Pipe('bottom', self.y + PIPE_HEIGHT + GAP_HEIGHT + gapChange + flowOffset)
     }
 
     -- whether this pipe pair is ready to be removed from the scene
