@@ -10,12 +10,29 @@
 
 ScoreState = Class{__includes = BaseState}
 
+BRONZE_SCORE = 5
+SILVER_SCORE = 10
+GOLD_SCORE = 30
+DIAMOND_SCORE = 50
+
+
 --[[
     When we enter the score state, we expect to receive the score
     from the play state so we know what to render to the State.
 ]]
 function ScoreState:enter(params)
     self.score = params.score
+        
+    self.medalSprite = gTextures['medal_none']
+    if self.score >= DIAMOND_SCORE then
+        self.medalSprite = gTextures['medal_diamond']
+    elseif self.score >= GOLD_SCORE then
+        self.medalSprite = gTextures['medal_gold']
+    elseif self.score >= SILVER_SCORE then
+        self.medalSprite = gTextures['medal_silver']
+    elseif self.score >= BRONZE_SCORE then
+        self.medalSprite = gTextures['medal_bronze']
+    end
 end
 
 function ScoreState:update(dt)
@@ -32,6 +49,8 @@ function ScoreState:render()
 
     love.graphics.setFont(mediumFont)
     love.graphics.printf('Score: ' .. tostring(self.score), 0, 100, VIRTUAL_WIDTH, 'center')
+    
+    love.graphics.draw(self.medalSprite, (VIRTUAL_WIDTH - self.medalSprite:getWidth())/2, 120)
 
-    love.graphics.printf('Press Enter to Play Again!', 0, 160, VIRTUAL_WIDTH, 'center')
+    love.graphics.printf('Press Enter to Play Again!', 0, 200, VIRTUAL_WIDTH, 'center')
 end
